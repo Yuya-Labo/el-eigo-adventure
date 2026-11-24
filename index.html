@@ -61,24 +61,38 @@
   }
 
   .hud {
-    background: #fff; border-radius: 18px; padding: 10px 14px;
-    box-shadow: 0 3px 12px rgba(44,42,41,0.07); margin-bottom: 10px;
-    display: flex; align-items: center; gap: 12px;
+    background: #fff; border-radius: 20px; padding: 14px 16px;
+    box-shadow: 0 4px 14px rgba(44,42,41,0.08); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 14px;
   }
   .hud-avatar {
-    width: 54px; height: 54px; border-radius: 14px; background: #eef6ff;
+    width: 64px; height: 64px; border-radius: 16px; background: #eef6ff;
     display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;
   }
-  .hud-avatar img { width: 48px; height: 48px; object-fit: contain; transform: scaleX(-1); }
+  .hud-avatar img { width: 56px; height: 56px; object-fit: contain; transform: scaleX(-1); }
   .hud-info { flex: 1; min-width: 0; }
-  .hud-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; gap: 6px; }
-  .hud-name { font-size: 15.5px; font-weight: 800; }
-  .hud-badges { display: flex; gap: 5px; align-items: center; }
-  .hud-lv { background: #fef3c7; color: #b45309; font-size: 12.5px; font-weight: 800; padding: 2px 9px; border-radius: 999px; }
-  .hud-coin { background: #fef08a; color: #854d0e; font-size: 12.5px; font-weight: 900; padding: 2px 9px; border-radius: 999px; }
-  .exp-bar { height: 9px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+  .hud-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; gap: 6px; }
+  .hud-name { font-size: 18px; font-weight: 900; }
+  .hud-badges { display: flex; gap: 6px; align-items: center; }
+  .hud-lv { background: #fef3c7; color: #b45309; font-size: 14.5px; font-weight: 900; padding: 4px 11px; border-radius: 999px; }
+  .hud-coin { background: #fef08a; color: #854d0e; font-size: 14.5px; font-weight: 900; padding: 4px 11px; border-radius: 999px; }
+  .exp-bar { height: 13px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
   .exp-fill { height: 100%; background: linear-gradient(90deg, #34d399, #10b981); width: 0%; transition: width 0.4s ease; }
-  .hud-sub { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-weight: 700; margin-top: 4px; }
+  .hud-sub { display: flex; justify-content: space-between; font-size: 14.5px; color: #4b5563; font-weight: 800; margin-top: 6px; }
+
+  .prep-sample-box {
+    background: #fffbeb; border: 2.5px solid #fcd34d; border-radius: 16px;
+    padding: 12px 14px; margin-bottom: 12px;
+  }
+  .prep-sample-title { font-size: 13px; font-weight: 900; color: #b45309; margin-bottom: 6px; }
+  .prep-sample-jp { font-size: 16.5px; font-weight: 800; line-height: 1.85; color: #1f2937; margin-bottom: 8px; }
+  .prep-sample-en { font-size: 19px; font-weight: 900; line-height: 1.85; color: #0f172a; background: #fff; border-radius: 12px; padding: 8px 10px; }
+  .ul-who { border-bottom: 4px solid var(--who-line); padding-bottom: 1px; }
+  .ul-do { border-bottom: 4px solid var(--do-line); padding-bottom: 1px; }
+  .ul-what { border-bottom: 4px solid var(--what-line); padding-bottom: 1px; }
+  .ul-with { border-bottom: 4px solid var(--with-line); padding-bottom: 1px; }
+  .ul-where { border-bottom: 4px solid var(--where-line); padding-bottom: 1px; }
+  .ul-when { border-bottom: 4px solid var(--when-line); padding-bottom: 1px; }
 
   .nav-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
   .nav-tab {
@@ -451,14 +465,34 @@
           </div>
         </div>
 
+        <div class="prep-sample-box">
+          <div class="prep-sample-title">👀 じゅんばんを見てみよう！（同じ色の線に注目！）</div>
+          <div class="prep-sample-jp">
+            <span class="ul-who">私は</span>
+            <span class="ul-when">放課後に</span>
+            <span class="ul-where">学校で</span>
+            <span class="ul-with">友達と</span>
+            <span class="ul-what">英語を</span>
+            <span class="ul-do">勉強します</span>。
+          </div>
+          <div class="prep-sample-en">
+            <span class="ul-who">I</span>
+            <span class="ul-do">study</span>
+            <span class="ul-what">English</span>
+            <span class="ul-with">with my friends</span>
+            <span class="ul-where">at school</span>
+            <span class="ul-when">after school</span>.
+          </div>
+        </div>
+
         <div class="example-ladder">
-          <div class="ex-row role-who"><span class="ex-key">① 誰が</span><span class="ex-sample">（私が、彼が など）</span></div>
+          <div class="ex-row role-who"><span class="ex-key">① だれが/は</span><span class="ex-sample">（私が、彼が など）</span></div>
           <div class="ex-arrow">↓</div>
           <div class="ex-row role-do"><span class="ex-key">② どうする</span><span class="ex-sample">（食べる、読む など）</span></div>
           <div class="ex-arrow">↓</div>
-          <div class="ex-row role-what"><span class="ex-key">③ 何を</span><span class="ex-sample">（肉を、本を など）</span></div>
+          <div class="ex-row role-what"><span class="ex-key">③ なにを</span><span class="ex-sample">（肉を、本を など）</span></div>
           <div class="ex-arrow">↓</div>
-          <div class="ex-row role-with"><span class="ex-key">④ 誰と</span><span class="ex-sample">（友達と、家族と など）</span></div>
+          <div class="ex-row role-with"><span class="ex-key">④ だれと</span><span class="ex-sample">（友達と、家族と など）</span></div>
           <div class="ex-arrow">↓</div>
           <div class="ex-row role-where"><span class="ex-key">⑤ どこで</span><span class="ex-sample">（家で、公園で など）</span></div>
           <div class="ex-arrow">↓</div>
@@ -621,10 +655,10 @@
       <div class="wrong-rule-box" id="wrongRuleBox" style="display:none;">
         <div class="wrong-rule-title">🔁 思い出そう！英語の語順ルール</div>
         <div class="rule-flow">
-          <span class="pill role-who">①誰が</span><span class="arrow">→</span>
+          <span class="pill role-who">①だれが/は</span><span class="arrow">→</span>
           <span class="pill role-do">②どうする</span><span class="arrow">→</span>
-          <span class="pill role-what">③何を</span><span class="arrow">→</span>
-          <span class="pill role-with">④誰と</span><span class="arrow">→</span>
+          <span class="pill role-what">③なにを</span><span class="arrow">→</span>
+          <span class="pill role-with">④だれと</span><span class="arrow">→</span>
           <span class="pill role-where">⑤どこで</span><span class="arrow">→</span>
           <span class="pill role-when">⑥いつ</span>
         </div>
@@ -734,7 +768,7 @@ function playBuzzerBoo() {
   osc.start(now); osc.stop(now + 0.40);
 }
 
-const SAVE_KEY = 'eiken_zoo_rpg_v8';
+const SAVE_KEY = 'eiken_zoo_rpg_v9';
 let state = loadState();
 let prepDoneThisSession = false;
 
@@ -744,7 +778,7 @@ function todayStr() {
 }
 function loadState() {
   try {
-    const raw = localStorage.getItem(SAVE_KEY) || localStorage.getItem('eiken_zoo_rpg_v7') || localStorage.getItem('eiken_zoo_rpg_v6');
+    const raw = localStorage.getItem(SAVE_KEY) || localStorage.getItem('eiken_zoo_rpg_v8') || localStorage.getItem('eiken_zoo_rpg_v7') || localStorage.getItem('eiken_zoo_rpg_v6');
     if (raw) {
       const s = JSON.parse(raw);
       if (!s.activeRanchBuddies) s.activeRanchBuddies = (s.buddies || []).slice();
@@ -872,10 +906,10 @@ function speak(text) {
 
 // === 出発準備 (Step 1: Example -> Step 2: Sort Puzzle) ===
 const SPELL_ITEMS = [
-  { text: "誰が", role: "who" },
+  { text: "だれが/は", role: "who" },
   { text: "どうする", role: "do" },
-  { text: "何を", role: "what" },
-  { text: "誰と", role: "with" },
+  { text: "なにを", role: "what" },
+  { text: "だれと", role: "with" },
   { text: "どこで", role: "where" },
   { text: "いつ", role: "when" }
 ];
@@ -969,7 +1003,7 @@ document.getElementById('warmupCheckBtn').onclick = () => {
     const fb = document.getElementById('warmupFeedback');
     fb.className = 'feedback show ng';
     document.getElementById('warmupFbTitle').textContent = '💡 6つぜんぶ並べてね！';
-    document.getElementById('warmupFbText').textContent = '「誰が」から順番に6つ選んでみよう！';
+    document.getElementById('warmupFbText').textContent = '「だれが/は」から順番に6つ選んでみよう！';
     return;
   }
   const isOk = warmupPlaced.every((pIdx, pos) => warmupPoolItems[pIdx].idx === pos);
@@ -986,13 +1020,13 @@ document.getElementById('warmupCheckBtn').onclick = () => {
     saveState();
     renderHUD();
     document.getElementById('warmupFbTitle').textContent = '⭕ 出発準備バッチリ！ +10 EXP / +10 🪙';
-    document.getElementById('warmupFbText').textContent = '「誰が → どうする → 何を → 誰と → どこで → いつ」！さあ「お出かけする」ことができるよ！';
+    document.getElementById('warmupFbText').textContent = '「だれが/は → どうする → なにを → だれと → どこで → いつ」！さあ「お出かけする」ことができるよ！';
     document.getElementById('warmupActionsBefore').style.display = 'none';
     document.getElementById('warmupActionsAfter').style.display = 'flex';
   } else {
     playBuzzerBoo();
     document.getElementById('warmupFbTitle').textContent = '❌ おしい！正しいじゅもんはこれだよ';
-    document.getElementById('warmupFbText').textContent = '「誰が → どうする → 何を → 誰と → どこで → いつ」だよ！もう1回並べてみよう！';
+    document.getElementById('warmupFbText').textContent = '「だれが/は → どうする → なにを → だれと → どこで → いつ」だよ！もう1回並べてみよう！';
     warmupAnswered = false;
     warmupPlaced = [];
     renderWarmupUI();
