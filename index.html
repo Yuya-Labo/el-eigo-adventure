@@ -932,7 +932,10 @@
     <div class="zone-problem">
       <div class="zone-header">
         <span class="zone-label prob">📝 もんだい</span>
-        <button class="hint-btn" id="hintToggleBtn">💡 ヒント</button>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <button type="button" class="hint-btn" id="speakJpBtn" style="background:#e0f2fe; color:#0369a1; border-color:#bae6fd;">🔊 よみあげ</button>
+          <button type="button" class="hint-btn" id="hintToggleBtn">💡 ヒント</button>
+        </div>
       </div>
       <div class="jp-sentence" id="jpSentence"></div>
     </div>
@@ -1534,9 +1537,10 @@ function stopPrepDemo(cancelSpeech = true) {
   if (cap) cap.textContent = '👀 じゅんばんを見てみよう！';
 }
 
-function speakJa(text) {
+function speakJa(text, cancelPrev = false) {
   if (!('speechSynthesis' in window)) return;
   try {
+    if (cancelPrev) window.speechSynthesis.cancel();
     if (window.speechSynthesis.paused) window.speechSynthesis.resume();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ja-JP';
@@ -2033,7 +2037,7 @@ function startStage(stageNum, customQuestions) {
   renderBattleQ();
 }
 
-document.getElementById('backToStagesBtn').onclick = () => openStageSelect(curArea.id);
+document.getElementById('backToStagesBtn').onclick = () => { if (window.speechSynthesis) try { window.speechSynthesis.cancel(); } catch(e) {} openStageSelect(curArea.id); };
 
 function currentQ() { return activeQuestions[qIdx]; }
 
@@ -2054,6 +2058,11 @@ function renderJpSentence(q) {
   });
 }
 
+document.getElementById('speakJpBtn').onclick = () => {
+  const q = currentQ();
+  const jpReadText = q.jpText || q.jpSegments.map(s => s.text).join('');
+  speakJa(jpReadText, true);
+};
 document.getElementById('hintToggleBtn').onclick = () => {
   hintOn = !hintOn;
   const btn = document.getElementById('hintToggleBtn');
@@ -2076,6 +2085,8 @@ function renderBattleQ() {
   document.getElementById('wrongRuleBox').style.display = 'none';
   document.getElementById('checkBtn').textContent = 'こたえ合わせ';
   renderJpSentence(q);
+  const jpReadText = q.jpText || q.jpSegments.map(s => s.text).join('');
+  speakJa(jpReadText, true);
 
   if (q.type === 'order') {
     document.getElementById('ansZoneLabel').textContent = '✏️ こたえ（ここに英語がならぶよ）';
