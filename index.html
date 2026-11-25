@@ -523,7 +523,7 @@
 
         <div class="prep-sample-box">
           <div class="prep-sample-head">
-            <div class="prep-sample-title">👀 じゅんばんを見てみよう！</div>
+            <div class="prep-sample-title" id="demoVoiceCaption">👀 じゅんばんを見てみよう！</div>
             <button type="button" class="btn-replay-demo" id="replayDemoBtn">🔊 もう1回きく</button>
           </div>
           <div class="prep-sample-jp">
@@ -997,40 +997,58 @@ document.getElementById('prepBtn').onclick = () => {
 };
 
 let demoTimers = [];
-function stopPrepDemo() {
+function unlockSpeechSync() {
+  if (!('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const silent = new SpeechSynthesisUtterance(' ');
+    silent.lang = 'ja-JP';
+    silent.volume = 0;
+    window.speechSynthesis.speak(silent);
+  } catch(e) {}
+}
+
+function stopPrepDemo(cancelSpeech = true) {
   demoTimers.forEach(t => clearTimeout(t));
   demoTimers = [];
-  if (window.speechSynthesis) {
+  if (cancelSpeech && window.speechSynthesis) {
     try { window.speechSynthesis.cancel(); } catch(e) {}
   }
   document.querySelectorAll('.demo-chunk').forEach(el => {
     el.classList.remove('ring-who','ring-do','ring-what','ring-with','ring-where','ring-when');
   });
   document.querySelectorAll('.ex-row').forEach(el => el.classList.remove('ring-active'));
+  const cap = document.getElementById('demoVoiceCaption');
+  if (cap) cap.textContent = '👀 じゅんばんを見てみよう！';
 }
 
 function speakJa(text) {
-  if (!window.speechSynthesis) return;
+  if (!('speechSynthesis' in window)) return;
   try {
-    window.speechSynthesis.cancel();
+    if (window.speechSynthesis.paused) window.speechSynthesis.resume();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ja-JP';
     u.rate = 0.95;
+    u.volume = 1;
+    const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+    const jaVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ja'));
+    if (jaVoice) u.voice = jaVoice;
     window.speechSynthesis.speak(u);
   } catch(e) {}
 }
 
 function runPrepDemo(delayMs) {
-  stopPrepDemo();
+  stopPrepDemo(false);
+  unlockSpeechSync();
   const steps = [
-    { role: 'who', say: 'だれが' },
-    { role: 'do', say: 'どうする' },
-    { role: 'what', say: 'なにを' },
-    { role: 'with', say: 'だれと' },
-    { role: 'where', say: 'どこで' },
-    { role: 'when', say: 'いつ' }
+    { role: 'who', say: 'だれが', label: '🗣️「だれが」' },
+    { role: 'do', say: 'どうする', label: '🗣️「どうする」' },
+    { role: 'what', say: 'なにを', label: '🗣️「なにを」' },
+    { role: 'with', say: 'だれと', label: '🗣️「だれと」' },
+    { role: 'where', say: 'どこで', label: '🗣️「どこで」' },
+    { role: 'when', say: 'いつ', label: '🗣️「いつ」' }
   ];
-  const stepMs = 1350;
+  const stepMs = 1400;
   steps.forEach((st, idx) => {
     const t = setTimeout(() => {
       if (document.getElementById('prepView').style.display === 'none' || document.getElementById('prepStep1').style.display === 'none') return;
@@ -1041,6 +1059,8 @@ function runPrepDemo(delayMs) {
       document.querySelectorAll('.ex-row').forEach(el => {
         el.classList.toggle('ring-active', el.dataset.ladderRole === st.role);
       });
+      const cap = document.getElementById('demoVoiceCaption');
+      if (cap) cap.textContent = st.label;
       speakJa(st.say);
     }, delayMs + idx * stepMs);
     demoTimers.push(t);
@@ -1050,11 +1070,13 @@ function runPrepDemo(delayMs) {
       el.classList.remove('ring-who','ring-do','ring-what','ring-with','ring-where','ring-when');
     });
     document.querySelectorAll('.ex-row').forEach(el => el.classList.remove('ring-active'));
+    const cap = document.getElementById('demoVoiceCaption');
+    if (cap) cap.textContent = '👀 じゅんばんを見てみよう！';
   }, delayMs + steps.length * stepMs + 800);
   demoTimers.push(endT);
 }
 
-document.getElementById('replayDemoBtn').onclick = () => runPrepDemo(100);
+document.getElementById('replayDemoBtn').onclick = () => runPrepDemo(50);
 document.getElementById('prepNextBtn').onclick = () => {
   stopPrepDemo();
   document.getElementById('prepStep1').style.display = 'none';
