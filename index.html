@@ -592,7 +592,7 @@
     border-color: #dc2626; color: #7f1d1d;
   }
 
-  /* === Title Screen & Settings (v14.8) === */
+  /* === Title Screen & Settings (v14.9) === */
   .title-screen {
     position: fixed;
     inset: 0;
@@ -793,7 +793,7 @@
   .be-speak-btn:active { transform: translateY(1px); }
 
 
-  /* === Player Select & Reset Popup (v14.8) === */
+  /* === Player Select & Reset Popup (v14.9) === */
   .title-player-btn {
     position: absolute;
     top: max(14px, calc(env(safe-area-inset-top, 8px) + 8px));
@@ -999,7 +999,7 @@
   }
 
 
-  /* === Map Switcher Bar & Word Study Flashcard (v14.8) === */
+  /* === Map Switcher Bar & Word Study Flashcard (v14.9) === */
   .map-switcher-bar {
     position: absolute;
     bottom: max(18px, calc(env(safe-area-inset-bottom, 10px) + 12px));
@@ -2241,7 +2241,7 @@ function renderBeQuizQ() {
   document.getElementById('beQuizProg').textContent = `${beQuizIdx + 1} / ${beQuizActive.length}`;
   document.getElementById('beQuizEn').textContent = q.en;
   document.getElementById('beQuizJa').textContent = q.ja;
-  try { speakJa(q.ja); } catch(e) {}
+  try { speakJa(q.ja, true); } catch(e) {}
   document.getElementById('beQuizFeedback').className = 'feedback';
   document.getElementById('beQuizNextBtn').style.display = 'none';
   document.getElementById('prep1DoneActions').style.display = 'none';
@@ -2472,7 +2472,6 @@ document.getElementById('titleStartBtn').onclick = () => {
 
 document.getElementById('beQuizSpeakBtn').onclick = () => {
   if (beQuizActive[beQuizIdx]) {
-    try { unlockSpeechSync(); } catch(e) {}
     speakJa(beQuizActive[beQuizIdx].ja, true, true);
   }
 };
@@ -2530,9 +2529,21 @@ function speakJa(text, cancelPrev = false, force = false) {
   } catch(e) {}
 }
 
+function highlightDemoStep(st) {
+  if (document.getElementById('prepView').style.display === 'none' || document.getElementById('prepStep1').style.display === 'none') return;
+  document.querySelectorAll('.demo-chunk').forEach(el => {
+    el.classList.remove('ring-who','ring-do','ring-what','ring-with','ring-where','ring-when');
+    if (st && el.dataset.demoRole === st.role) el.classList.add('ring-' + st.role);
+  });
+  document.querySelectorAll('.ex-row').forEach(el => {
+    el.classList.toggle('ring-active', !!st && el.dataset.ladderRole === st.role);
+  });
+  const cap = document.getElementById('demoVoiceCaption');
+  if (cap) cap.textContent = st ? st.label : '👀 じゅんばんを見てみよう！';
+}
+
 function runPrepDemo(delayMs) {
-  stopPrepDemo(false);
-  unlockSpeechSync();
+  stopPrepDemo(true);
   const steps = [
     { role: 'who', say: 'だれが', label: '🗣️「だれが」' },
     { role: 'do', say: 'どうする', label: '🗣️「どうする」' },
@@ -2541,31 +2552,36 @@ function runPrepDemo(delayMs) {
     { role: 'where', say: 'どこで', label: '🗣️「どこで」' },
     { role: 'when', say: 'いつ', label: '🗣️「いつ」' }
   ];
+  if (appSettings.tts && ('speechSynthesis' in window)) {
+    try {
+      if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+      const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+      const jaVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ja'));
+      steps.forEach((st, idx) => {
+        const u = new SpeechSynthesisUtterance(st.say);
+        u.lang = 'ja-JP';
+        u.rate = 0.92;
+        u.volume = 1;
+        if (jaVoice) u.voice = jaVoice;
+        u.onstart = () => highlightDemoStep(st);
+        if (idx === steps.length - 1) {
+          u.onend = () => {
+            const endT = setTimeout(() => highlightDemoStep(null), 500);
+            demoTimers.push(endT);
+          };
+          u.onerror = () => highlightDemoStep(null);
+        }
+        window.speechSynthesis.speak(u);
+      });
+      return;
+    } catch(e) {}
+  }
   const stepMs = 1400;
   steps.forEach((st, idx) => {
-    const t = setTimeout(() => {
-      if (document.getElementById('prepView').style.display === 'none' || document.getElementById('prepStep1').style.display === 'none') return;
-      document.querySelectorAll('.demo-chunk').forEach(el => {
-        el.classList.remove('ring-who','ring-do','ring-what','ring-with','ring-where','ring-when');
-        if (el.dataset.demoRole === st.role) el.classList.add('ring-' + st.role);
-      });
-      document.querySelectorAll('.ex-row').forEach(el => {
-        el.classList.toggle('ring-active', el.dataset.ladderRole === st.role);
-      });
-      const cap = document.getElementById('demoVoiceCaption');
-      if (cap) cap.textContent = st.label;
-      speakJa(st.say);
-    }, delayMs + idx * stepMs);
+    const t = setTimeout(() => highlightDemoStep(st), (delayMs || 50) + idx * stepMs);
     demoTimers.push(t);
   });
-  const endT = setTimeout(() => {
-    document.querySelectorAll('.demo-chunk').forEach(el => {
-      el.classList.remove('ring-who','ring-do','ring-what','ring-with','ring-where','ring-when');
-    });
-    document.querySelectorAll('.ex-row').forEach(el => el.classList.remove('ring-active'));
-    const cap = document.getElementById('demoVoiceCaption');
-    if (cap) cap.textContent = '👀 じゅんばんを見てみよう！';
-  }, delayMs + steps.length * stepMs + 800);
+  const endT = setTimeout(() => highlightDemoStep(null), (delayMs || 50) + steps.length * stepMs + 800);
   demoTimers.push(endT);
 }
 
