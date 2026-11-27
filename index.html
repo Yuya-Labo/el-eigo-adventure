@@ -592,7 +592,7 @@
     border-color: #dc2626; color: #7f1d1d;
   }
 
-  /* === Title Screen & Settings (v14.7) === */
+  /* === Title Screen & Settings (v14.8) === */
   .title-screen {
     position: fixed;
     inset: 0;
@@ -793,7 +793,7 @@
   .be-speak-btn:active { transform: translateY(1px); }
 
 
-  /* === Player Select & Reset Popup (v14.7) === */
+  /* === Player Select & Reset Popup (v14.8) === */
   .title-player-btn {
     position: absolute;
     top: max(14px, calc(env(safe-area-inset-top, 8px) + 8px));
@@ -999,7 +999,7 @@
   }
 
 
-  /* === Map Switcher Bar & Word Study Flashcard (v14.7) === */
+  /* === Map Switcher Bar & Word Study Flashcard (v14.8) === */
   .map-switcher-bar {
     position: absolute;
     bottom: max(18px, calc(env(safe-area-inset-bottom, 10px) + 12px));
@@ -3081,7 +3081,7 @@ function showWordStudyCard() {
   document.getElementById('wordStudyNextBtn').textContent = (wordStudyIdx + 1 < wordStudyCards.length)
     ? 'つぎのたんご ▶'
     : 'クイズにちょうせん！🚀';
-  setTimeout(() => speak(c.en), 220);
+  speak(c.en);
 }
 document.getElementById('wordStudySpeakBtn').onclick = () => {
   if (wordStudyCards[wordStudyIdx]) speak(wordStudyCards[wordStudyIdx].en);
@@ -3180,6 +3180,14 @@ document.getElementById('speakJpBtn').onclick = () => {
   const q = currentQ();
   if (curArea.id === 'sea' || curArea.id === 'town') {
     speak(q.jpText, null, true);
+  } else if (curArea.id === 'words') {
+    const enWordMatch = (q.sentenceBefore || '').match(/「([A-Za-z][A-Za-z0-9\s\-']*)」/);
+    if (enWordMatch) {
+      speak(enWordMatch[1], null, true);
+    } else {
+      const jpReadText = q.jpText || (q.jpSegments ? q.jpSegments.map(s => s.text).join('') : '');
+      speakJa(jpReadText, true);
+    }
   } else {
     const jpReadText = q.jpText || (q.jpSegments ? q.jpSegments.map(s => s.text).join('') : '');
     speakJa(jpReadText, true);
@@ -3225,7 +3233,15 @@ function renderBattleQ() {
   document.getElementById('checkBtn').textContent = 'こたえ合わせ';
   renderJpSentence(q);
   if (curArea && (curArea.id === 'sea' || curArea.id === 'town')) {
-    setTimeout(() => { if (currentQ() === q) speak(q.jpText); }, 100);
+    speak(q.jpText);
+  } else if (curArea && curArea.id === 'words') {
+    const enWordMatch = (q.sentenceBefore || '').match(/「([A-Za-z][A-Za-z0-9\s\-']*)」/);
+    if (enWordMatch) {
+      speak(enWordMatch[1]);
+    } else {
+      const jpReadText = q.jpText || (q.jpSegments ? q.jpSegments.map(s => s.text).join('') : '');
+      speakJa(jpReadText, true);
+    }
   } else {
     const jpReadText = q.jpText || (q.jpSegments ? q.jpSegments.map(s => s.text).join('') : '');
     speakJa(jpReadText, true);
@@ -3338,11 +3354,19 @@ function onAnswered(isOk, explain, fullEnglish) {
   }
 
   if (isOk) {
+    unlockSpeechSync();
     playElephantPaoon();
     const checkBtn = document.getElementById('checkBtn');
     if (checkBtn) checkBtn.style.display = 'none';
+    let speechTarget = fullEnglish;
+    if (curArea && curArea.id === 'words') {
+      const ansEn = (q.answer || '').match(/^[A-Za-z][A-Za-z0-9\s\-']*$/);
+      const befEn = (q.sentenceBefore || '').match(/「([A-Za-z][A-Za-z0-9\s\-']*)」/);
+      if (ansEn) speechTarget = q.answer;
+      else if (befEn) speechTarget = befEn[1];
+    }
     setTimeout(() => {
-      speak(fullEnglish, () => {
+      speak(speechTarget, () => {
         if (answered && checkBtn) checkBtn.style.display = '';
       });
     }, 650);
